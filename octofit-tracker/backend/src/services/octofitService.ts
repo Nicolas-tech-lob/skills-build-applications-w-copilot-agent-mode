@@ -101,8 +101,38 @@ export async function getLeaderboard() {
   return teams.map((team, index) => ({ ...team, rank: index + 1 }));
 }
 
-export async function suggestWorkouts(_userEmail: string) {
-  return Workout.find().limit(1).lean();
+export async function suggestWorkouts(userEmail: string) {
+  const user = await User.findOne({ email: userEmail }).select('fitnessGoal').lean();
+  if (!user) {
+    throw Object.assign(new Error('User was not found'), { status: 404 });
+  }
+
+  const goal = user.fitnessGoal?.trim().toLowerCase();
+  if (goal) {
+    const goalWorkouts = await Workout.find({ focus: goal }).lean();
+    if (goalWorkouts.length > 0) {
+      return goalWorkouts.map((workout) => ({
+        ...workout,
+        reason: `Recommended because it matches your ${goal} fitness goal.`,
+      }));
+    }
+  }
+
+  const recentActivity = await Activity.findOne({ user: user._id })
+    .sort({ occurredAt: -1 })
+    .select('type')
+    .lean();
+  if (!recentActivity) return [];
+
+  const activityType = recentActivity.type.trim().toLowerCase();
+  const focus = ['run', 'running', 'cycle', 'cycling', 'walk', 'walking'].includes(activityType)
+    ? 'endurance'
+    : activityType;
+  const activityWorkouts = await Workout.find({ focus }).lean();
+  return activityWorkouts.map((workout) => ({
+    ...workout,
+    reason: `Recommended based on your recent ${recentActivity.type} activity.`,
+  }));
 }
 
 export { User };
