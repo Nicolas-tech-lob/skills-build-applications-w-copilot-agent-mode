@@ -42,8 +42,9 @@ Record your plan here before editing code.
 
 Record the commands you run and what each failure means.
 
-- Data-tier command: `npm run test:data --prefix octofit-tracker/backend`
-- API command: `npm run test:api --prefix octofit-tracker/backend`
-- Frontend command: `npm test --prefix octofit-tracker/frontend`
-- Backend build command: `npm run build --prefix octofit-tracker/backend`
-- Frontend build command: `npm run build --prefix octofit-tracker/frontend`
+- Data-tier command: `npm run test:data --prefix octofit-tracker/backend` - PASS (5/5); a failure indicates a schema validation or seed idempotency/preservation regression.
+- API command: `npm run test:api --prefix octofit-tracker/backend` - PASS (4/4); a failure indicates an API response, validation, persistence, ranking, or recommendation contract regression.
+- Frontend command: `npm test --prefix octofit-tracker/frontend` - PASS (15/15); a failure indicates a data rendering, route request, or loading/empty/error state regression.
+- Backend build command: `npm run build --prefix octofit-tracker/backend` - PASS; a failure indicates a backend TypeScript compilation error.
+- Frontend build command: `npm run build --prefix octofit-tracker/frontend` - PASS; a failure indicates a frontend type-check or Vite production-build error.
+- Integrated final check: `node .github/scripts/grade-step.mjs step5-final` - PASS (2026-10-27).
